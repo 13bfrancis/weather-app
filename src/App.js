@@ -1,28 +1,50 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
-}
+const App = () => {
+  const [weatherInput, updateInput] = useState('');
+  const [zip, updateZip] = useState('90224');
+  const [temperature, updateTemperature] = useState();
+  useEffect(
+    () => {
+      fetch(
+        `https://api.openweathermap.org/data/2.5/weather?zip=${zip},us&units=imperial&appid=95554b619f027de1be782ba59006dc38`
+      )
+        .then(results => {
+          console.log(results);
+          return results.json();
+        })
+        .then(data => {
+          updateTemperature(data.main.temp);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    [zip]
+  );
+  return (
+    <>
+      <input
+        placeholder="Enter Zip Code"
+        type="text"
+        value={weatherInput}
+        onChange={e => {
+          updateInput(e.target.value);
+        }}
+        onKeyPress={e => {
+          if (e.key === 'Enter') updateZip(weatherInput);
+        }}
+      />
+      <button
+        onClick={() => {
+          updateZip(weatherInput);
+        }}
+      >
+        Get Temperature
+      </button>
+      {temperature && <h3>{temperature}</h3>}
+    </>
+  );
+};
 
 export default App;
